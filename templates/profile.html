@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row g-4 py-4">
+    <!-- Left Sidebar: Profile Info -->
+    <div class="col-md-4">
+        <div class="card glass-card border-0 text-center overflow-hidden fade-in-up">
+            <!-- decorative background header -->
+            <div class="bg-primary bg-gradient py-5 position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25"></div>
+                <img src="{{ url_for('static', filename='uploads/profile_pics/' + (user.profile_pic if user.profile_pic else 'default.png')) }}"
+                     class="rounded-circle shadow-lg bg-white border border-4 border-white mt-4 profile-img-lg position-relative"
+                     style="z-index: 10;"
+                     alt="Profile Picture"
+                     onerror="this.src='https://via.placeholder.com/130?text=User'">
+            </div>
+            <div class="card-body pt-5 pb-5 px-4">
+                <h3 class="fw-bold mb-1">{{ user.name }}</h3>
+                <p class="text-muted mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ user.location or 'Location not set' }}</p>
+                <p class="mb-4 text-secondary">{{ user.bio or 'This user prefers to keep an air of mystery. No bio provided yet.' }}</p>
+                <div class="d-grid">
+                    <a href="{{ url_for('profile_bp.edit_profile') }}" class="btn btn-outline-primary rounded-pill">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Content: Skills & Reviews -->
+    <div class="col-md-8">
+        
+        <!-- Skills Row -->
+        <div class="row g-4 mb-4">
+            <!-- Skills I Can Teach -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                        <h5 class="fw-bold text-success mb-0">
+                            <i class="bi bi-mortarboard-fill fs-4 align-middle me-2"></i>I Can Teach
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            {% for skill in skills_offered %}
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">
+                                {{ skill.skill_name }}
+                                <a href="{{ url_for('profile_bp.remove_skill', skill_type='offered', skill_id=skill.id) }}" class="text-danger ms-2 text-decoration-none" title="Remove">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </a>
+                            </span>
+                            {% endfor %}
+                            {% if not skills_offered %}
+                            <p class="text-muted small mb-0 w-100 italic">No skills added yet.</p>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('profile_bp.add_skill', skill_type='offered') }}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="skill_name" class="form-control rounded-start-pill" placeholder="Skill name" required>
+                                <button class="btn btn-success rounded-end-pill px-3" type="submit"><i class="bi bi-plus-lg"></i> Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills I Want to Learn -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                        <h5 class="fw-bold text-primary mb-0">
+                            <i class="bi bi-book-half fs-4 align-middle me-2"></i>I Want to Learn
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            {% for skill in skills_wanted %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">
+                                {{ skill.skill_name }}
+                                <a href="{{ url_for('profile_bp.remove_skill', skill_type='wanted', skill_id=skill.id) }}" class="text-danger ms-2 text-decoration-none" title="Remove">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </a>
+                            </span>
+                            {% endfor %}
+                            {% if not skills_wanted %}
+                            <p class="text-muted small mb-0 w-100 italic">No skills added yet.</p>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('profile_bp.add_skill', skill_type='wanted') }}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="skill_name" class="form-control rounded-start-pill" placeholder="Skill name" required>
+                                <button class="btn btn-primary rounded-end-pill px-3" type="submit"><i class="bi bi-plus-lg"></i> Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Endorsements & Reviews -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill mb-4" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill fw-semibold" id="pills-reviews-tab" data-bs-toggle="pill" data-bs-target="#pills-reviews" type="button" role="tab">
+                            <i class="bi bi-star-fill text-warning me-1"></i> Reviews
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill fw-semibold" id="pills-endorse-tab" data-bs-toggle="pill" data-bs-target="#pills-endorse" type="button" role="tab">
+                            <i class="bi bi-hand-thumbs-up-fill text-info me-1"></i> Endorsements
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="pills-tabContent">
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade show active" id="pills-reviews" role="tabpanel">
+                        {% if reviews %}
+                            <div class="list-group list-group-flush">
+                                {% for r in reviews %}
+                                <div class="list-group-item border-0 px-0 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold">{{ r.reviewer_name }}</h6>
+                                        <small class="text-muted">{{ r.created_at.strftime('%b %d, %Y') }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        {% for i in range(r.rating) %}<i class="bi bi-star-fill text-warning small"></i>{% endfor %}
+                                    </div>
+                                    <p class="mb-0 text-secondary">{{ r.comment }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-chat-square-text fs-1 opacity-25 d-block mb-2"></i>
+                                No reviews yet. Complete a swap session to get reviewed!
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Endorsements Tab -->
+                    <div class="tab-pane fade" id="pills-endorse" role="tabpanel">
+                        {% if endorsements %}
+                            <div class="d-flex flex-wrap gap-2 pt-2">
+                                {% for e in endorsements %}
+                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm">
+                                    <span class="fw-bold">{{ e.skill_name }}</span> 
+                                    <span class="text-muted fw-normal ms-1">by {{ e.endorser_name }}</span>
+                                </span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-award fs-1 opacity-25 d-block mb-2"></i>
+                                No endorsements yet.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
