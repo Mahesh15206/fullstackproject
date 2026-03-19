@@ -1,0 +1,56 @@
+<!-- admin/dashboard.html — Admin dashboard with stats -->
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — Skill Swap{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-shield-lock"></i> Admin Dashboard</h2>
+<hr>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card shadow text-center bg-primary text-white">
+            <div class="card-body">
+                <h1>{{ user_count }}</h1>
+                <p class="mb-0">Total Users</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow text-center bg-warning text-dark">
+            <div class="card-body">
+                <h1>{{ pending_requests }}</h1>
+                <p class="mb-0">Pending Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow text-center bg-danger text-white">
+            <div class="card-body">
+                <h1>{{ pending_reports }}</h1>
+                <p class="mb-0">Pending Reports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow text-center bg-success text-white">
+            <div class="card-body">
+                <h1>{{ completed_sessions }}</h1>
+                <p class="mb-0">Completed Sessions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <a href="{{ url_for('admin_bp.admin_users') }}" class="btn btn-outline-primary btn-lg w-100 mb-3">
+            <i class="bi bi-people"></i> Manage Users
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a href="{{ url_for('admin_bp.admin_reports') }}" class="btn btn-outline-danger btn-lg w-100 mb-3">
+            <i class="bi bi-flag"></i> View Reports
+        </a>
+    </div>
+</div>
+{% endblock %}

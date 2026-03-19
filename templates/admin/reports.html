@@ -1,0 +1,58 @@
+<!-- admin/reports.html — Admin reports management -->
+{% extends 'base.html' %}
+{% block title %}Reports — Admin{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-flag"></i> User Reports</h2>
+<a href="{{ url_for('admin_bp.admin_dashboard') }}" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Back to Admin</a>
+<hr>
+
+{% if reports %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Reporter</th>
+                <th>Reported</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.id }}</td>
+                <td>{{ report.reporter_name }}</td>
+                <td>{{ report.reported_name }}</td>
+                <td>{{ report.reason }}</td>
+                <td>
+                    <span class="badge
+                        {% if report.status == 'pending' %}bg-warning text-dark
+                        {% elif report.status == 'reviewed' %}bg-info
+                        {% else %}bg-success{% endif %}">
+                        {{ report.status|capitalize }}
+                    </span>
+                </td>
+                <td>
+                    {% if report.status != 'resolved' %}
+                    <a href="{{ url_for('admin_bp.resolve_report', report_id=report.id) }}" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-lg"></i> Resolve
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('admin_bp.admin_delete_user', user_id=report.reported_id) }}"
+                       class="btn btn-outline-danger btn-sm"
+                       onclick="return confirm('Delete reported user?')">
+                        <i class="bi bi-trash"></i> Delete User
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="bi bi-check-circle"></i> No reports at this time.</div>
+{% endif %}
+{% endblock %}
