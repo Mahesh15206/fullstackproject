@@ -1,0 +1,146 @@
+<!-- requests.html — Combined Requests & Connections page with Bootstrap tabs -->
+{% extends 'base.html' %}
+{% block title %}Requests & Connections — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4 fade-in-up">
+    <div class="col">
+        <h2 class="fw-bold mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Requests & Connections</h2>
+        <p class="text-muted small mb-0">Manage your skill swap invitations and network</p>
+    </div>
+</div>
+
+<!-- Bootstrap Tabs -->
+<ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill mb-4 shadow-sm fade-in-up" id="socialTabs" role="tablist" style="animation-delay: 0.1s;">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill fw-semibold" id="incoming-tab" data-bs-toggle="tab" data-bs-target="#incoming" type="button" role="tab">
+            <i class="bi bi-inbox-fill me-1"></i>Incoming
+            {% if incoming %}<span class="badge bg-danger ms-1">{{ incoming|length }}</span>{% endif %}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-semibold" id="outgoing-tab" data-bs-toggle="tab" data-bs-target="#outgoing" type="button" role="tab">
+            <i class="bi bi-send-fill me-1"></i>Outgoing
+            {% if outgoing %}<span class="badge bg-primary ms-1">{{ outgoing|length }}</span>{% endif %}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-semibold" id="connections-tab" data-bs-toggle="tab" data-bs-target="#connections" type="button" role="tab">
+            <i class="bi bi-people-fill me-1"></i>Connections
+            {% if partners %}<span class="badge bg-success ms-1">{{ partners|length }}</span>{% endif %}
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="socialTabContent">
+
+    <!-- Tab 1: Incoming Requests -->
+    <div class="tab-pane fade show active" id="incoming" role="tabpanel">
+        {% if incoming %}
+        <div class="list-group rounded-4">
+            {% for req in incoming %}
+            <div class="list-group-item d-flex align-items-center justify-content-between p-4 border-light">
+                <div class="d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + req.sender_pic) }}"
+                         class="rounded-circle me-3 shadow-sm border border-2 border-white" width="48" height="48"
+                         onerror="this.src='https://via.placeholder.com/48?text=U'">
+                    <div>
+                        <strong class="text-dark">{{ req.sender_name }}</strong> wants to swap skills with you.
+                        <br><small class="text-muted"><i class="bi bi-clock me-1"></i>{{ req.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('social_bp.accept_request', request_id=req.id) }}" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold">
+                        <i class="bi bi-check-lg"></i> Accept
+                    </a>
+                    <a href="{{ url_for('social_bp.reject_request', request_id=req.id) }}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold">
+                        <i class="bi bi-x-lg"></i> Reject
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-envelope-x fs-1 opacity-25 d-block mb-2"></i>
+            No incoming requests at the moment.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tab 2: Outgoing Requests -->
+    <div class="tab-pane fade" id="outgoing" role="tabpanel">
+        {% if outgoing %}
+        <div class="list-group rounded-4">
+            {% for req in outgoing %}
+            <div class="list-group-item d-flex align-items-center justify-content-between p-4 border-light">
+                <div class="d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + req.receiver_pic) }}"
+                         class="rounded-circle me-3 shadow-sm border border-2 border-white" width="48" height="48"
+                         onerror="this.src='https://via.placeholder.com/48?text=U'">
+                    <div>
+                        <strong class="text-dark">{{ req.receiver_name }}</strong>
+                        <br>
+                        <span class="badge rounded-pill align-text-bottom
+                            {% if req.status == 'pending' %}bg-warning bg-opacity-25 text-dark border border-warning border-opacity-50
+                            {% elif req.status == 'accepted' %}bg-success bg-opacity-10 text-success border border-success border-opacity-50
+                            {% elif req.status == 'rejected' %}bg-danger bg-opacity-10 text-danger border border-danger border-opacity-50
+                            {% else %}bg-secondary{% endif %} px-2">
+                            {{ req.status|capitalize }}
+                        </span>
+                        <small class="text-muted ms-2"><i class="bi bi-calendar3 me-1"></i>{{ req.created_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                </div>
+                {% if req.status == 'pending' %}
+                <a href="{{ url_for('social_bp.cancel_request', request_id=req.id) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-send-x fs-1 opacity-25 d-block mb-2"></i>
+            No outgoing requests sent yet. Find matches on the Dashboard!
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tab 3: Connections -->
+    <div class="tab-pane fade" id="connections" role="tabpanel">
+        {% if partners %}
+        <div class="row g-4 pt-2">
+            {% for partner in partners %}
+            <div class="col-md-4 mb-4 fade-in-up" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                <div class="card glass-card border-0 h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{{ url_for('static', filename='uploads/profile_pics/' + partner.profile_pic) }}"
+                             class="rounded-circle mb-3 shadow-sm border border-2 border-white" width="80" height="80"
+                             onerror="this.src='https://via.placeholder.com/80?text=U'">
+                        <h5 class="fw-bold mb-1">{{ partner.name }}</h5>
+                        <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ partner.location or 'Unknown' }}</p>
+                        <div class="d-grid mt-auto gap-2">
+                            <a href="{{ url_for('dashboard_bp.view_profile', user_id=partner.id) }}" class="btn btn-outline-primary rounded-pill btn-sm">
+                                <i class="bi bi-eye-fill"></i> View Profile
+                            </a>
+                            <a href="{{ url_for('sessions_bp.review', user_id=partner.id) }}" class="btn btn-warning rounded-pill btn-sm shadow-sm">
+                                <i class="bi bi-star-fill text-dark"></i> <span class="text-dark fw-semibold">Review & Endorse</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-people fs-1 opacity-25 d-block mb-2"></i>
+            No connections yet. Send swap requests from the Dashboard!
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
