@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ partner.name }} — Skill Swap{% endblock %}
+
+{% block head %}
+<!-- Chat-specific styles are now in style.css -->
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card glass-card border-0 shadow-lg fade-in-up">
+            <div class="card-header bg-transparent border-light py-3 px-4 d-flex align-items-center">
+                <div class="position-relative">
+                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + partner.profile_pic) }}"
+                         class="rounded-circle shadow-sm border border-2 border-white me-3" width="45" height="45"
+                         onerror="this.src='https://via.placeholder.com/45?text=U'">
+                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">{{ partner.name }}</h5>
+                    <small class="text-success small fw-medium">Online</small>
+                </div>
+                <a href="{{ url_for('chat_bp.my_chats') }}" class="btn btn-outline-secondary btn-sm ms-auto rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+            </div>
+            
+            <div class="card-body p-0">
+                <!-- Chat Messages -->
+                <div id="chatBox" class="bg-transparent border-0 rounded-0" style="height: 500px; padding: 24px; overflow-y: auto;">
+    {% for msg in messages %}
+    <div class="d-flex align-items-center {% if msg.sender_id == session.get('user_id') %}justify-content-end{% endif %}" id="msg-container-{{ msg.id }}">
+        
+        {% if msg.sender_id == session.get('user_id') %}
+        <button class="btn btn-sm text-danger opacity-50 px-2 py-1 border-0 shadow-none mx-1" onclick="deleteMessage({{ msg.id }})" title="Delete Message">
+            <i class="bi bi-trash"></i>
+        </button>
+        {% endif %}
+
+        <div class="msg-bubble {% if msg.sender_id == session.get('user_id') %}msg-sent{% else %}msg-received{% endif %}">
+            {% if msg.message_type == 'voice' %}
+            <audio controls src="{{ url_for('static', filename=msg.file_path) }}"></audio>
+            {% else %}
+            {{ msg.message_text }}
+            {% endif %}
+            <div class="text-end"><small style="font-size: 0.7rem; opacity: 0.7;">{{ msg.sent_at.strftime('%H:%M') }}</small></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+                <!-- Message Input -->
+                <div class="card-footer bg-transparent border-light p-4">
+                    <form id="messageForm">
+                        <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden">
+                            <input type="text" id="messageInput" class="form-control border-0 px-4" placeholder="Type your message..." autocomplete="off">
+                            <button type="button" id="voiceBtn" class="btn btn-outline-danger border-0 px-3" title="Record Voice">
+                                <i class="bi bi-mic-fill"></i>
+                            </button>
+                            <button class="btn btn-primary border-0 px-4" type="submit">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="voiceStatus" class="mt-2 text-center" style="display:none;">
+                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                            <i class="bi bi-record-circle-fill me-1 pulse-animation"></i> Recording... 
+                            <button id="stopVoice" class="btn btn-sm btn-link text-danger p-0 ms-2 fw-bold text-decoration-none">Stop & Send</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- SocketIO client library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+    // Initialize chat with room ID and current user info
+    initChat({{ room_id }}, {{ session.get('user_id') }}, {{ session.get('user_name') | tojson }});
+</script>
+{% endblock %}
