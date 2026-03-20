@@ -1,0 +1,109 @@
+<!-- view_profile.html — Public profile with endorse button -->
+{% extends 'base.html' %}
+{% block title %}{{ user.name }} — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='uploads/profile_pics/' + user.profile_pic) }}"
+                     class="rounded-circle mb-3" width="120" height="120"
+                     onerror="this.src='https://via.placeholder.com/120?text=User'">
+                <h4>{{ user.name }}</h4>
+                <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ user.location or 'Not set' }}</p>
+                <p>{{ user.bio or 'No bio.' }}</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ url_for('social_bp.send_request', receiver_id=user.id) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-arrow-left-right"></i> Swap Request
+                    </a>
+                    <a href="{{ url_for('sessions_bp.review', user_id=user.id) }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-star"></i> Review
+                    </a>
+                    <a href="{{ url_for('social_bp.block_user', user_id=user.id) }}" class="btn btn-outline-danger btn-sm"
+                       onclick="return confirm('Block this user?')">
+                        <i class="bi bi-slash-circle"></i> Block
+                    </a>
+                </div>
+                <!-- Report Form -->
+                <form method="POST" action="{{ url_for('social_bp.report_user', user_id=user.id) }}" class="mt-3">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="reason" class="form-control" placeholder="Report reason..." required>
+                        <button class="btn btn-outline-danger" type="submit"><i class="bi bi-flag"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Skills Offered -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-mortarboard"></i> Skills They Teach</h5>
+            </div>
+            <div class="card-body">
+                {% for skill in skills_offered %}
+                <span class="badge bg-success me-1 mb-1 skill-tag">
+                    {{ skill.skill_name }}
+                    {% if skill.is_verified %}<i class="bi bi-patch-check-fill"></i>{% endif %}
+                    {% if skill.skill_name not in already_endorsed %}
+                    <a href="{{ url_for('dashboard_bp.endorse', user_id=user.id, skill_name=skill.skill_name) }}"
+                       class="text-white ms-1" title="Endorse this skill">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </a>
+                    {% else %}
+                    <i class="bi bi-check-circle text-white ms-1" title="You endorsed this"></i>
+                    {% endif %}
+                </span>
+                {% endfor %}
+                {% if not skills_offered %}<p class="text-muted">No skills listed yet.</p>{% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Wanted -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-book"></i> Skills They Want to Learn</h5>
+            </div>
+            <div class="card-body">
+                {% for skill in skills_wanted %}
+                <span class="badge bg-primary me-1 mb-1">{{ skill.skill_name }}</span>
+                {% endfor %}
+                {% if not skills_wanted %}<p class="text-muted">No skills listed yet.</p>{% endif %}
+            </div>
+        </div>
+
+        <!-- Endorsements -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-hand-thumbs-up"></i> Endorsements</h5>
+            </div>
+            <div class="card-body">
+                {% for e in endorsements %}
+                <span class="badge bg-warning text-dark me-1 mb-1">{{ e.skill_name }} — by {{ e.endorser_name }}</span>
+                {% endfor %}
+                {% if not endorsements %}<p class="text-muted">No endorsements yet.</p>{% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-star"></i> Reviews</h5>
+            </div>
+            <div class="card-body">
+                {% for r in reviews %}
+                <div class="mb-3 border-bottom pb-2">
+                    <strong>{{ r.reviewer_name }}</strong>
+                    — {% for i in range(r.rating) %}<i class="bi bi-star-fill text-warning"></i>{% endfor %}
+                    <p class="mb-0">{{ r.comment }}</p>
+                    <small class="text-muted">{{ r.created_at.strftime('%b %d, %Y') }}</small>
+                </div>
+                {% endfor %}
+                {% if not reviews %}<p class="text-muted">No reviews yet.</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

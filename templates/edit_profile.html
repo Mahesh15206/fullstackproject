@@ -1,0 +1,62 @@
+<!-- edit_profile.html — Edit profile and change password -->
+{% extends 'base.html' %}
+{% block title %}Edit Profile — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4"><i class="bi bi-pencil-square"></i> Edit Profile</h3>
+                <form method="POST" action="{{ url_for('profile_bp.edit_profile') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ user.location or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.bio or '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Profile Picture</label>
+                        <input type="file" class="form-control mb-3" id="profile_pic" name="profile_pic" accept="image/*">
+                        
+                        <div class="p-3 bg-light rounded-3 border">
+                            <p class="form-label small text-muted mb-2">Or choose a quick avatar:</p>
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="emoji_avatar" id="avatarBoy" value="emoji_boy.svg">
+                                    <label class="form-check-label fs-5" for="avatarBoy" title="Boy Avatar">
+                                        👦 Boy
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="emoji_avatar" id="avatarGirl" value="emoji_girl.svg">
+                                    <label class="form-check-label fs-5" for="avatarGirl" title="Girl Avatar">
+                                        👧 Girl
+                                    </label>
+                                </div>
+                                <div class="form-check ms-auto">
+                                    <input class="form-check-input" type="radio" name="emoji_avatar" id="avatarKeep" value="" checked>
+                                    <label class="form-check-label text-muted small" for="avatarKeep">
+                                        Keep Current Image
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

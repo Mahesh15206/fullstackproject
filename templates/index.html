@@ -1,0 +1,64 @@
+<!-- index.html — Landing page with hero section -->
+{% extends 'base.html' %}
+{% block title %}Skill Swap Platform — Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section with 3D Background -->
+<div class="hero-wrapper text-center mb-5 shadow-lg">
+    <div id="canvas-container"></div>
+    <div class="container hero-content py-5">
+        <h1 class="display-3 fw-bold mb-4 fade-in-up" style="animation-delay: 0.1s;">Master New Skills Together</h1>
+        <p class="lead mb-5 fade-in-up px-md-5" style="animation-delay: 0.3s; opacity: 0.9;">
+            The ultimate platform to exchange knowledge. Teach what you love, learn what you need. 
+            Join our community of over 1,000+ skill swappers.
+        </p>
+        <div class="d-flex justify-content-center gap-3 fade-in-up" style="animation-delay: 0.5s;">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg shadow">Get Started Free</a>
+            <a href="#features" class="btn btn-outline-light btn-lg">Explore Features</a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Row -->
+<div class="container" id="features">
+    <div class="row text-center mb-5 g-4">
+        <div class="col-md-4">
+            <div class="card glass-card h-100 p-4 border-0 shadow-sm fade-in-up" style="animation-delay: 0.6s;">
+                <div class="mb-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3">
+                        <i class="bi bi-search fs-2"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Smart Matching</h5>
+                <p class="text-muted mb-0 small">Our algorithm finds partners with skills that perfectly complement your learning goals.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card glass-card h-100 p-4 border-0 shadow-sm fade-in-up" style="animation-delay: 0.7s;">
+                <div class="mb-3">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-3">
+                        <i class="bi bi-chat-heart fs-2"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Interactive Learning</h5>
+                <p class="text-muted mb-0 small">Connect via real-time chat, voice messages, and collaborative session scheduling.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card glass-card h-100 p-4 border-0 shadow-sm fade-in-up" style="animation-delay: 0.8s;">
+                <div class="mb-3">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-3">
+                        <i class="bi bi-graph-up-arrow fs-2"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Verified Progress</h5>
+                <p class="text-muted mb-0 small">Take verification quizzes, set milestones, and earn certifications as you grow.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/three_bg.js') }}"></script>
+{% endblock %}
