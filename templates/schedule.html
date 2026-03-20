@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Learning Sessions — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row mb-5 fade-in-up">
+    <div class="col">
+        <h2 class="fw-bold mb-0"><i class="bi bi-calendar-event-fill text-primary me-2"></i>Learning Sessions</h2>
+        <p class="text-muted small mb-0">Book and manage your skill swap appointments</p>
+    </div>
+</div>
+
+<!-- Schedule New Session -->
+<div class="card glass-card border-0 shadow-lg mb-5 fade-in-up" style="animation-delay: 0.1s;">
+    <div class="card-header bg-transparent border-light py-3 px-4">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Schedule New Session</h5>
+    </div>
+    <div class="card-body p-4">
+        {% if partners %}
+        <form method="POST" action="{{ url_for('sessions_bp.schedule') }}">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="partner_id" class="form-label fw-semibold text-secondary">Partner</label>
+                    <select name="partner_id" id="partner_id" class="form-select rounded-pill px-3" required>
+                        <option value="">Select partner...</option>
+                        {% for p in partners %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="topic" class="form-label fw-semibold text-secondary">Topic</label>
+                    <input type="text" name="topic" id="topic" class="form-control rounded-pill px-3" placeholder="e.g. Python Basics" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="session_datetime" class="form-label fw-semibold text-secondary">Date & Time</label>
+                    <input type="datetime-local" name="session_datetime" id="session_datetime" class="form-control rounded-pill px-3" required>
+                </div>
+            </div>
+            <div class="text-end mt-2">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow">
+                    <i class="bi bi-calendar-plus-fill me-2"></i>Schedule Session
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>You need accepted connections before you can schedule sessions.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Existing Sessions -->
+<h4>Your Sessions</h4>
+{% if sessions %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Topic</th>
+                <th>With</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td>{{ s.topic }}</td>
+                <td>
+                    {% if s.organizer_id == session.get('user_id') %}
+                    {{ s.partner_name }}
+                    {% else %}
+                    {{ s.organizer_name }}
+                    {% endif %}
+                </td>
+                <td>{{ s.session_datetime.strftime('%b %d, %Y %H:%M') }}</td>
+                <td>
+                    <span class="badge
+                        {% if s.status == 'scheduled' %}bg-warning text-dark
+                        {% elif s.status == 'completed' %}bg-success
+                        {% else %}bg-secondary{% endif %}">
+                        {{ s.status|capitalize }}
+                    </span>
+                </td>
+                <td>
+                    {% if s.status == 'scheduled' %}
+                    <a href="{{ url_for('sessions_bp.complete_session', session_id=s.id) }}" class="btn btn-success btn-sm">
+                        <i class="bi bi-check"></i> Complete
+                    </a>
+                    <a href="{{ url_for('sessions_bp.cancel_session', session_id=s.id) }}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-x"></i> Cancel
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">No sessions yet.</p>
+{% endif %}
+{% endblock %}

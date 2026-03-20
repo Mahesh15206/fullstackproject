@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Learning Progress — Skill Swap{% endblock %}
+
+{% block content %}
+<div class="row mb-5 fade-in-up">
+    <div class="col">
+        <h2 class="fw-bold mb-0"><i class="bi bi-activity text-primary me-2"></i>Learning Progress</h2>
+        <p class="text-muted small mb-0">Track your skill development and milestones</p>
+    </div>
+</div>
+
+<!-- Add New Goal -->
+<div class="card glass-card border-0 shadow-lg mb-5 fade-in-up" style="animation-delay: 0.1s;">
+    <div class="card-header bg-transparent border-light py-3 px-4">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Add Learning Goal</h5>
+    </div>
+    <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('sessions_bp.progress') }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="skill_name" class="form-label fw-semibold text-secondary">Skill Name</label>
+                    <input type="text" name="skill_name" id="skill_name" class="form-control rounded-pill px-3" placeholder="e.g. Python Programming" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="target_sessions" class="form-label fw-semibold text-secondary">Target Sessions</label>
+                    <input type="number" name="target_sessions" id="target_sessions" class="form-control rounded-pill px-3" value="5" min="1" max="50">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill px-3 shadow">
+                        <i class="bi bi-plus-lg me-1"></i>Add
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Goals List -->
+{% if goals %}
+<div class="row">
+    {% for goal in goals %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5>
+                    {{ goal.skill_name }}
+                    {% if goal.is_achieved %}
+                    <span class="badge bg-success"><i class="bi bi-trophy"></i> Achieved!</span>
+                    {% endif %}
+                </h5>
+                <p class="text-muted mb-2">{{ goal.completed_sessions }} / {{ goal.target_sessions }} sessions completed</p>
+                {% set percent = (goal.completed_sessions / goal.target_sessions * 100) if goal.target_sessions > 0 else 0 %}
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar
+                        {% if percent >= 100 %}bg-success
+                        {% elif percent >= 50 %}bg-primary
+                        {% else %}bg-warning{% endif %}"
+                        role="progressbar"
+                        style="width: {{ percent }}%;">
+                        {{ percent|int }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No learning goals yet. Add one above!
+</div>
+{% endif %}
+{% endblock %}
